@@ -106,4 +106,20 @@ class WarpCommand {
             .send();
     }
 
+
+    @Execute(name = "gui add")
+    @Permission("eternalcore.setwarp")
+    @DescriptionDocs(description = "Add warp to warp inventory", arguments = "<warp>")
+    void add(@Context Player player, @Arg Warp warp) {
+        if (!this.warpManager.warpExists(warp.getName())) {
+            // warp does not exist
+
+            return;
+        }
+
+
+
+
+        this.warpInventory.addItem(warp);
+    }
 }

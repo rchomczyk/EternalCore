@@ -3,6 +3,7 @@ package com.eternalcode.core.feature.warp;
 import com.eternalcode.commons.adventure.AdventureUtil;
 import com.eternalcode.commons.bukkit.position.PositionAdapter;
 import com.eternalcode.core.configuration.contextual.ConfigItem;
+import com.eternalcode.core.feature.warp.config.WarpInventoryItem;
 import com.eternalcode.core.injector.annotations.Inject;
 import com.eternalcode.core.injector.annotations.component.Service;
 import com.eternalcode.core.feature.language.Language;
@@ -21,6 +22,7 @@ import org.bukkit.entity.Player;
 import panda.std.Option;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -72,7 +74,7 @@ class WarpInventory {
                 player.closeInventory();
 
                 if (player.hasPermission("eternalcore.warp.bypass")) {
-                    this.teleportTaskService.createTeleport(player.getUniqueId(), PositionAdapter.convert(player.getLocation()),  PositionAdapter.convert(warp.getLocation()), Duration.ZERO);
+                    this.teleportTaskService.createTeleport(player.getUniqueId(), PositionAdapter.convert(player.getLocation()), PositionAdapter.convert(warp.getLocation()), Duration.ZERO);
                     return;
                 }
 
@@ -157,6 +159,45 @@ class WarpInventory {
             .name(name)
             .lore(lore)
             .glow(item.glow());
+    }
+
+    public void addItem(Warp warp) {
+
+        Translation translationEN = this.translationManager.getMessages(Language.EN);
+        Translation.WarpSection.WarpInventorySection warpSectionEN = translationEN.warp().warpInventory();
+
+        Translation translationPL = this.translationManager.getMessages(Language.PL);
+        Translation.WarpSection.WarpInventorySection warpSectionPL = translationPL.warp().warpInventory();
+
+        int slotNumber = warpSectionEN.items().values().size() + 10;
+
+        WarpInventoryItem warpInventoryItemEN = new WarpInventoryItem();
+
+        warpInventoryItemEN.warpName = warp.getName();
+        warpInventoryItemEN.warpItem = ConfigItem.builder()
+            .withName("&6Warp: &f" + warp.getName())
+            .withLore(Collections.singletonList("&7Click to teleport to warp"))
+            .withMaterial(Material.PLAYER_HEAD)
+            .withTexture("ewogICJ0aW1lc3RhbXAiIDogMTY2NDAzNTM1MjUyNCwKICAicHJvZmlsZUlkIiA6ICJjYjIzZWZhOWY1N2U0ZTQyOGE0MDU2OTM4NDlhODAxZiIsCiAgInByb2ZpbGVOYW1lIiA6ICJWMUdHTyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS82MThhZjBiODNhZGZmNzM1MDA3ZmVkMjMwMTkxOWMwYjYzZWJmZTgwZTVkNjFiYTkzN2M5MmViMWVhY2Y2ZDI4IgogICAgfQogIH0KfQ==")
+            .withSlot(slotNumber)
+            .withGlow(true)
+            .build();
+
+        WarpInventoryItem warpInventoryItemPL = new WarpInventoryItem();
+
+        warpInventoryItemPL.warpName = warp.getName();
+        warpInventoryItemPL.warpItem = ConfigItem.builder()
+            .withName("&6Warp: &f" + warp.getName())
+            .withLore(Collections.singletonList("&7Click to teleport to warp"))
+            .withMaterial(Material.PLAYER_HEAD)
+            .withTexture("ewogICJ0aW1lc3RhbXAiIDogMTY2NDAzNTM1MjUyNCwKICAicHJvZmlsZUlkIiA6ICJjYjIzZWZhOWY1N2U0ZTQyOGE0MDU2OTM4NDlhODAxZiIsCiAgInByb2ZpbGVOYW1lIiA6ICJWMUdHTyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS82MThhZjBiODNhZGZmNzM1MDA3ZmVkMjMwMTkxOWMwYjYzZWJmZTgwZTVkNjFiYTkzN2M5MmViMWVhY2Y2ZDI4IgogICAgfQogIH0KfQ==")
+            .withSlot(slotNumber)
+            .withGlow(true)
+            .build();
+
+        warpSectionEN.items().put(warp.getName(), warpInventoryItemEN);
+        warpSectionPL.items().put(warp.getName(), warpInventoryItemPL);
+
     }
 
     public void openInventory(Player player, Language language) {
