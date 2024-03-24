@@ -373,8 +373,10 @@ public class PluginConfiguration implements ReloadableConfig {
 
     @Contextual
     public static class Warp {
-        @Description("# Warp inventory should be enabled?")
-        public boolean inventoryEnabled = true;
+        @Description({"# Warp inventory should be enabled?",
+        "# Enabling this option will create warpgui.yml file in the plugin folder.",
+        "# File contains the configuration of the warp inventory."})
+        public boolean inventoryEnabled = false;
     }
 
     @Description({ " ", "# Butcher" })

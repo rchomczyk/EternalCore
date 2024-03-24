@@ -372,41 +372,8 @@ public class ENTranslation extends AbstractTranslation {
         @Contextual
         public static class ENWarpInventory implements WarpInventorySection {
             public String title = "<dark_gray>» <green>Available warps:";
-            public int rows = 3;
 
-            public Map<String, WarpInventoryItem> items = Map.of("default", WarpInventoryItem.builder()
-                .withWarpName("default")
-                .withWarpItem(ConfigItem.builder()
-                    .withName("&8» &6Warp: &fdefault")
-                    .withLore(Collections.singletonList("<gray>Click to teleport!"))
-                    .withMaterial(Material.ENDER_PEARL)
-                    .withSlot(10)
-                    .withGlow(true)
-                    .build())
-                .build());
 
-            public ENBorderSection border = new ENBorderSection();
-            public ENDecorationItemsSection decorationItems = new ENDecorationItemsSection();
-
-            @Getter
-            @Contextual
-            public static class ENBorderSection implements BorderSection {
-                public boolean enabled = true;
-
-                public Material material = Material.GRAY_STAINED_GLASS_PANE;
-
-                public BorderSection.FillType fillType = BorderSection.FillType.BORDER;
-
-                public String name = "";
-
-                public List<String> lore = Collections.emptyList();
-            }
-
-            @Getter
-            @Contextual
-            public static class ENDecorationItemsSection implements DecorationItemsSection {
-                public List<ConfigItem> items = List.of();
-            }
         }
     }
 

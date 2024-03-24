@@ -2,7 +2,9 @@ package com.eternalcode.core.feature.warp;
 
 import com.eternalcode.commons.adventure.AdventureUtil;
 import com.eternalcode.commons.bukkit.position.PositionAdapter;
+import com.eternalcode.core.configuration.ConfigurationManager;
 import com.eternalcode.core.configuration.contextual.ConfigItem;
+import com.eternalcode.core.configuration.implementation.WarpGuiConfiguration;
 import com.eternalcode.core.feature.warp.config.WarpInventoryItem;
 import com.eternalcode.core.injector.annotations.Inject;
 import com.eternalcode.core.injector.annotations.component.Service;
@@ -19,7 +21,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
-import panda.std.Option;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -32,38 +33,53 @@ class WarpInventory {
 
     private final TeleportTaskService teleportTaskService;
     private final TranslationManager translationManager;
+    private final ConfigurationManager configurationManager;
+    private final WarpGuiConfiguration warpGuiConfiguration;
     private final WarpManager warpManager;
     private final Server server;
     private final MiniMessage miniMessage;
 
     @Inject
-    WarpInventory(TeleportTaskService teleportTaskService, TranslationManager translationManager, WarpManager warpManager, Server server, MiniMessage miniMessage) {
+    WarpInventory(
+        TeleportTaskService teleportTaskService,
+        TranslationManager translationManager,
+        ConfigurationManager configurationManager,
+        WarpGuiConfiguration warpGuiConfiguration,
+        WarpManager warpManager,
+        Server server,
+        MiniMessage miniMessage
+    ) {
         this.teleportTaskService = teleportTaskService;
         this.translationManager = translationManager;
+        this.configurationManager = configurationManager;
+        this.warpGuiConfiguration = warpGuiConfiguration;
         this.warpManager = warpManager;
         this.server = server;
         this.miniMessage = miniMessage;
     }
 
     private Gui createInventory(Language language) {
-        Translation translation = this.translationManager.getMessages(language);
-        Translation.WarpSection.WarpInventorySection warpSection = translation.warp().warpInventory();
+
+        WarpGuiConfiguration warpGuiConfiguration = this.configurationManager.load(this.warpGuiConfiguration);
+        Translation.WarpSection.WarpInventorySection warpSection = this.translationManager.getMessages(language).warp().warpInventory();
+
+
 
         Gui gui = Gui.gui()
             .title(this.miniMessage.deserialize(warpSection.title()))
-            .rows(warpSection.rows())
+            .rows(this.warpGuiConfiguration.rows)
             .disableAllInteractions()
             .create();
 
-        warpSection.items().values().forEach(item -> {
-            Optional<Warp> warpOptional = this.warpManager.findWarp(item.warpName());
+        this.warpGuiConfiguration.items.forEach((key, warpInventoryItem) -> {
+            Optional<Warp> warpOptional = this.warpManager.findWarp(warpInventoryItem.warpName);
 
             if (warpOptional.isEmpty()) {
                 return;
             }
 
             Warp warp = warpOptional.get();
-            ConfigItem warpItem = item.warpItem();
+            ConfigItem warpItem = warpInventoryItem.warpItem;
 
             BaseItemBuilder baseItemBuilder = this.createItem(warpItem);
             GuiItem guiItem = baseItemBuilder.asGuiItem();
@@ -89,17 +105,16 @@ class WarpInventory {
             gui.setItem(warpItem.slot(), guiItem);
         });
 
-        if (warpSection.border().enabled()) {
-            Translation.WarpSection.WarpInventorySection.BorderSection borderSection = warpSection.border();
+        if (warpGuiConfiguration.enabled) {
 
-            ItemBuilder borderItem = ItemBuilder.from(borderSection.material());
+            ItemBuilder borderItem = ItemBuilder.from(warpGuiConfiguration.material);
 
-            if (!borderSection.name().equals("")) {
-                borderItem.name(AdventureUtil.resetItalic(this.miniMessage.deserialize(borderSection.name())));
+            if (!warpGuiConfiguration.name.equals("")) {
+                borderItem.name(AdventureUtil.resetItalic(this.miniMessage.deserialize(warpGuiConfiguration.name)));
             }
 
-            if (!borderSection.lore().isEmpty()) {
-                borderItem.lore(borderSection.lore()
+            if (!warpGuiConfiguration.lore.isEmpty()) {
+                borderItem.lore(warpGuiConfiguration.lore
                     .stream()
                     .map(entry -> AdventureUtil.resetItalic(this.miniMessage.deserialize(entry)))
                     .collect(Collectors.toList()));
@@ -107,16 +122,16 @@ class WarpInventory {
 
             GuiItem guiItem = new GuiItem(borderItem.build());
 
-            switch (borderSection.fillType()) {
+            switch (warpGuiConfiguration.fillType) {
                 case BORDER -> gui.getFiller().fillBorder(guiItem);
                 case ALL -> gui.getFiller().fill(guiItem);
                 case TOP -> gui.getFiller().fillTop(guiItem);
                 case BOTTOM -> gui.getFiller().fillBottom(guiItem);
-                default -> throw new IllegalStateException("Unexpected value: " + borderSection.fillType());
+                default -> throw new IllegalStateException("Unexpected value: " + warpGuiConfiguration.fillType);
             }
         }
 
-        for (ConfigItem item : warpSection.decorationItems().items()) {
+        for (ConfigItem item : warpGuiConfiguration.decorationItems) {
             BaseItemBuilder baseItemBuilder = this.createItem(item);
             GuiItem guiItem = baseItemBuilder.asGuiItem();
 
@@ -169,7 +184,8 @@ class WarpInventory {
         Translation translationPL = this.translationManager.getMessages(Language.PL);
         Translation.WarpSection.WarpInventorySection warpSectionPL = translationPL.warp().warpInventory();
 
-        int slotNumber = warpSectionEN.items().values().size() + 10;
+        int firstSlotNumber = 10;
+        int slotNumber = this.warpGuiConfiguration.items.values().size() + 10;
 
         WarpInventoryItem warpInventoryItemEN = new WarpInventoryItem();
 
@@ -195,8 +211,7 @@ class WarpInventory {
             .withGlow(true)
             .build();
 
-        warpSectionEN.items().put(warp.getName(), warpInventoryItemEN);
-        warpSectionPL.items().put(warp.getName(), warpInventoryItemPL);
+        this.warpGuiConfiguration.items.put(warp.getName(), warpInventoryItemEN);
 
     }
 

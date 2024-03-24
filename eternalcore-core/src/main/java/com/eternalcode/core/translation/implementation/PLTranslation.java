@@ -374,6 +374,9 @@ public class PLTranslation extends AbstractTranslation {
         @Contextual
         public static class PLWarpInventory implements WarpInventorySection {
             public String title = "<dark_gray>» <green>Lista dostępnych warpów";
+
+
+            /*
             public int rows = 3;
 
             public Map<String, WarpInventoryItem> items = Map.of("default", WarpInventoryItem.builder()
@@ -409,6 +412,8 @@ public class PLTranslation extends AbstractTranslation {
             public static class PLDecorationItemsSection implements DecorationItemsSection {
                 public List<ConfigItem> items = List.of();
             }
+            */
+
         }
     }
 

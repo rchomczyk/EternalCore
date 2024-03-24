@@ -144,6 +144,7 @@ public interface Translation {
 
         interface WarpInventorySection {
             String title();
+            /*
             int rows();
 
             Map<String, WarpInventoryItem> items();
@@ -169,7 +170,7 @@ public interface Translation {
 
             interface DecorationItemsSection {
                 List<ConfigItem> items();
-            }
+            }*/
         }
     }
 
