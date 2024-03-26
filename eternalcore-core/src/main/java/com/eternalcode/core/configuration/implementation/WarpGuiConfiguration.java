@@ -17,7 +17,7 @@ import java.util.Map;
 @ConfigurationFile
 public class WarpGuiConfiguration implements ReloadableConfig {
 
-    public Map<String, WarpInventoryItem> items = Map.of("example", WarpInventoryItem.builder()
+    public Map<String, WarpInventoryItem> warpItems = Map.of("example", WarpInventoryItem.builder()
         .withWarpName("example")
         .withWarpItem(ConfigItem.builder()
             .withName("&8» &Example: &fWarp")
@@ -29,26 +29,24 @@ public class WarpGuiConfiguration implements ReloadableConfig {
         .build());
 
 
-    public int rows = 4;
+    public int warpItemsRows = 4;
 
 
-    public boolean enabled = true;
+    public boolean borderEnabled = true;
 
-    public Material material = Material.GRAY_STAINED_GLASS_PANE;
+    public Material borderMaterial = Material.GRAY_STAINED_GLASS_PANE;
 
-    public FillType fillType = FillType.ALL;
+    public FillType borderFillType = FillType.ALL;
 
-    public String name = "";
+    public String borderItemName = "";
 
-    public List<String> lore = Collections.emptyList();
+    public List<String> borderItemLore = Collections.emptyList();
 
     public enum FillType {
         TOP, BOTTOM, BORDER, ALL
     }
 
     public List<ConfigItem> decorationItems = List.of();
-
-
 
     @Override
     public Resource resource(File folder) {

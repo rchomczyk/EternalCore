@@ -67,11 +67,11 @@ class WarpInventory {
 
         Gui gui = Gui.gui()
             .title(this.miniMessage.deserialize(warpSection.title()))
-            .rows(this.warpGuiConfiguration.rows)
+            .rows(this.warpGuiConfiguration.warpItemsRows)
             .disableAllInteractions()
             .create();
 
-        this.warpGuiConfiguration.items.forEach((key, warpInventoryItem) -> {
+        this.warpGuiConfiguration.warpItems.forEach((key, warpInventoryItem) -> {
             Optional<Warp> warpOptional = this.warpManager.findWarp(warpInventoryItem.warpName);
 
             if (warpOptional.isEmpty()) {
@@ -105,16 +105,16 @@ class WarpInventory {
             gui.setItem(warpItem.slot(), guiItem);
         });
 
-        if (warpGuiConfiguration.enabled) {
+        if (warpGuiConfiguration.borderEnabled) {
 
-            ItemBuilder borderItem = ItemBuilder.from(warpGuiConfiguration.material);
+            ItemBuilder borderItem = ItemBuilder.from(warpGuiConfiguration.borderMaterial);
 
-            if (!warpGuiConfiguration.name.equals("")) {
-                borderItem.name(AdventureUtil.resetItalic(this.miniMessage.deserialize(warpGuiConfiguration.name)));
+            if (!warpGuiConfiguration.borderItemName.equals("")) {
+                borderItem.name(AdventureUtil.resetItalic(this.miniMessage.deserialize(warpGuiConfiguration.borderItemName)));
             }
 
-            if (!warpGuiConfiguration.lore.isEmpty()) {
-                borderItem.lore(warpGuiConfiguration.lore
+            if (!warpGuiConfiguration.borderItemLore.isEmpty()) {
+                borderItem.lore(warpGuiConfiguration.borderItemLore
                     .stream()
                     .map(entry -> AdventureUtil.resetItalic(this.miniMessage.deserialize(entry)))
                     .collect(Collectors.toList()));
@@ -122,12 +122,12 @@ class WarpInventory {
 
             GuiItem guiItem = new GuiItem(borderItem.build());
 
-            switch (warpGuiConfiguration.fillType) {
+            switch (warpGuiConfiguration.borderFillType) {
                 case BORDER -> gui.getFiller().fillBorder(guiItem);
                 case ALL -> gui.getFiller().fill(guiItem);
                 case TOP -> gui.getFiller().fillTop(guiItem);
                 case BOTTOM -> gui.getFiller().fillBottom(guiItem);
-                default -> throw new IllegalStateException("Unexpected value: " + warpGuiConfiguration.fillType);
+                default -> throw new IllegalStateException("Unexpected value: " + warpGuiConfiguration.borderFillType);
             }
         }
 
@@ -185,7 +185,7 @@ class WarpInventory {
         Translation.WarpSection.WarpInventorySection warpSectionPL = translationPL.warp().warpInventory();
 
         int firstSlotNumber = 10;
-        int slotNumber = this.warpGuiConfiguration.items.values().size() + 10;
+        int slotNumber = this.warpGuiConfiguration.warpItems.values().size() + 10;
 
         WarpInventoryItem warpInventoryItemEN = new WarpInventoryItem();
 
@@ -211,7 +211,7 @@ class WarpInventory {
             .withGlow(true)
             .build();
 
-        this.warpGuiConfiguration.items.put(warp.getName(), warpInventoryItemEN);
+        this.warpGuiConfiguration.warpItems.put(warp.getName(), warpInventoryItemEN);
 
     }
 
